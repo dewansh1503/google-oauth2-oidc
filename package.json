@@ -1,0 +1,20 @@
+{
+  "name": "google-oauth2-oidc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dewansh1503/google-oauth2-oidc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dewansh1503/google-oauth2-oidc/issues"
+  },
+  "homepage": "https://github.com/dewansh1503/google-oauth2-oidc#readme"
+}
