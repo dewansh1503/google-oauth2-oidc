@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Google OAuth2 + OpenID Connect implementation",
   "main": "index.js",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dewansh1503/google-oauth2-oidc.git"
@@ -15,5 +14,8 @@
   "bugs": {
     "url": "https://github.com/dewansh1503/google-oauth2-oidc/issues"
   },
-  "homepage": "https://github.com/dewansh1503/google-oauth2-oidc#readme"
+  "homepage": "https://github.com/dewansh1503/google-oauth2-oidc#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
 }
