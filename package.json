@@ -4,7 +4,8 @@
 	"description": "Google OAuth2 + OpenID Connect implementation",
 	"main": "index.js",
 	"scripts": {
-		"dev": "node index.js"
+		"dev": "node index.js",
+		"watch": "nodemon index_copy.js"
 	},
 	"repository": {
 		"type": "git",
