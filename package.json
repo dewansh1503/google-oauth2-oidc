@@ -1,31 +1,34 @@
 {
-  "name": "google-oauth2-oidc",
-  "version": "1.0.0",
-  "description": "Google OAuth2 + OpenID Connect implementation",
-  "main": "index.js",
-  "scripts": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dewansh1503/google-oauth2-oidc.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/dewansh1503/google-oauth2-oidc/issues"
-  },
-  "homepage": "https://github.com/dewansh1503/google-oauth2-oidc#readme",
-  "dependencies": {
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.6",
-    "crypto": "^1.0.1",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "google-auth-library": "^10.9.0",
-    "jsonwebtoken": "^9.0.3",
-    "redis": "^6.1.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.14"
-  }
+	"name": "google-oauth2-oidc",
+	"version": "1.0.0",
+	"description": "Google OAuth2 + OpenID Connect implementation",
+	"main": "index.js",
+	"scripts": {
+		"dev": "node index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/dewansh1503/google-oauth2-oidc.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/dewansh1503/google-oauth2-oidc/issues"
+	},
+	"homepage": "https://github.com/dewansh1503/google-oauth2-oidc#readme",
+	"dependencies": {
+		"cookie-parser": "^1.4.7",
+		"cors": "^2.8.6",
+		"crypto": "^1.0.1",
+		"dotenv": "^17.4.2",
+		"express": "^5.2.1",
+		"google-auth-library": "^10.9.0",
+		"jsonwebtoken": "^9.0.3",
+		"redis": "^6.1.0"
+	},
+	"devDependencies": {
+		"nodemon": "^3.1.14"
+	}
 }
+
