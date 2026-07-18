@@ -28,7 +28,8 @@
 		"google-auth-library": "^10.9.0",
 		"jsonwebtoken": "^9.0.3",
 		"pg": "^8.22.0",
-		"redis": "^6.1.0"
+		"redis": "^6.1.0",
+		"ua-parser-js": "^2.0.10"
 	},
 	"devDependencies": {
 		"nodemon": "^3.1.14"
