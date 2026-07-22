@@ -33,6 +33,17 @@ const pool = new Pool({
 	connectionTimeoutMillis: 7000,
 });
 
+async function checkDB() {
+	try {
+		const client = await pool.connect();
+		console.log('PostgreSQL connected');
+		client.release();
+	} catch (err) {
+		throw new apiError(503, `PostgreSQL ${err.message}`);
+	}
+}
+checkDB();
+
 app.listen(3000, () => {
 	console.log('listening');
 });
