@@ -44,6 +44,10 @@ async function checkDB() {
 }
 checkDB();
 
+function random(encoding = 'base64url', size = 32) {
+	return crypto.randomBytes(size).toString(encoding);
+}
+
 app.listen(3000, () => {
 	console.log('listening');
 });
