@@ -23,6 +23,16 @@ async function checkRedis() {
 }
 checkRedis();
 
+const pool = new Pool({
+	host: 'localhost',
+	port: process.env.PSQL_PORT,
+	user: process.env.PSQL_USER,
+	password: process.env.PSQL_PASSWORD,
+	database: process.env.PSQL_DATABASE,
+	// error will be thrown after 10sec if not able to connect to db
+	connectionTimeoutMillis: 7000,
+});
+
 app.listen(3000, () => {
 	console.log('listening');
 });
