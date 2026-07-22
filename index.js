@@ -48,6 +48,12 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+const googleClient = new OAuth2Client(
+	process.env.GOOGLE_CLIENT_ID,
+	process.env.GOOGLE_CLIENT_SECRET,
+	process.env.REDIRECT_URI,
+);
+
 app.listen(3000, () => {
 	console.log('listening');
 });
