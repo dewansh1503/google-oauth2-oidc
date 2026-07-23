@@ -56,6 +56,7 @@ const googleClient = new OAuth2Client(
 
 app.get('/api/auth/google', async (req, res) => {});
 
+app.get('/api/auth/google/callback', async (req, res, next) => {});
 
 app.listen(3000, () => {
 	console.log('listening');
