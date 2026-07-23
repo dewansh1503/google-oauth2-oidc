@@ -144,6 +144,21 @@ app.get('/api/auth/google/callback', async (req, res, next) => {
 
 	// generating ref_token(hash) and storing it in psql
 	const refreshToken = await setRefreshToken(userID);
+
+	const options = {
+			httpOnly: true,
+			sameSite: 'lax',
+			secure: true,
+		};
+		res.cookie('accessToken', accessToken, {
+			...options,
+			expires: addDays(new Date(), process.env.ACCESS_TOKEN_EXPIRY),
+		});
+		res.cookie('refreshToken', refreshToken, {
+			...options,
+			expires: addDays(new Date(), process.env.REFRESH_TOKEN_EXPIRY),
+		});
+		res.redirect('http://localhost:4000');
 });
 
 app.listen(3000, () => {
