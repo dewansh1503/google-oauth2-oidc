@@ -54,7 +54,39 @@ const googleClient = new OAuth2Client(
 	process.env.REDIRECT_URI,
 );
 
-app.get('/api/auth/google', async (req, res) => {});
+app.get('/api/auth/google', async (req, res) => {
+	const code_verifier = random();
+	const codeChallenge = crypto
+		.createHash('sha256')
+		.update(code_verifier)
+		.digest('base64url');
+
+	const state = random('hex');
+	const nonce = random('hex');
+
+	const url = googleClient.generateAuthUrl({
+		access_type: 'offline', // for getting refresh token
+		scope: ['openid', 'email', 'profile'],
+		prompt: 'consent', // always show consent screen to user
+		state,
+		nonce,
+		code_challenge: codeChallenge,
+		code_challenge_method: 'S256',
+	});
+
+	// pushing [state, nonce, code_verifier] to redis
+	await redisClient.set(
+		`state:${state}`,
+		JSON.stringify({ nonce, code_verifier }),
+		{
+			expiration: {
+				type: 'EX',
+				value: 300, // sec (5 min)
+			},
+		},
+	);
+	res.redirect(url);
+});
 
 app.get('/api/auth/google/callback', async (req, res, next) => {});
 
