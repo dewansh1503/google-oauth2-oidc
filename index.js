@@ -90,34 +90,60 @@ app.get('/api/auth/google', async (req, res) => {
 
 app.get('/api/auth/google/callback', async (req, res, next) => {
 	const code = req.query.code;
-		const state = req.query.state;
-		if (!code) {
-			throw new apiError(400, 'Access denied by user');
-		}
-		if (!state) {
-			throw new apiError(403, 'Unauthorized access missing state');
-		}
+	const state = req.query.state;
+	if (!code) {
+		throw new apiError(400, 'Access denied by user');
+	}
+	if (!state) {
+		throw new apiError(403, 'Unauthorized access missing state');
+	}
 
-		const storedData = await redisClient.getDel(`state:${state}`);
-		if (!storedData) {
-			throw new apiError(403, 'Invalid or missing state');
-		}
+	const storedData = await redisClient.getDel(`state:${state}`);
+	if (!storedData) {
+		throw new apiError(403, 'Invalid or missing state');
+	}
 
-		const storedDataJson = JSON.parse(storedData);
-		const { tokens } = await googleClient.getToken({
-			code,
-			codeVerifier: storedDataJson.code_verifier,
-		});
+	const storedDataJson = JSON.parse(storedData);
+	const { tokens } = await googleClient.getToken({
+		code,
+		codeVerifier: storedDataJson.code_verifier,
+	});
 
-		const ticket = await googleClient.verifyIdToken({
-			idToken: tokens.id_token,
-			audience: process.env.GOOGLE_CLIENT_ID,
-		});
-		const payload = ticket.getPayload();
-		if (payload.nonce !== storedDataJson.nonce) {
-			throw new apiError(404, 'Invalid token nonce missing');
-		}
+	const ticket = await googleClient.verifyIdToken({
+		idToken: tokens.id_token,
+		audience: process.env.GOOGLE_CLIENT_ID,
+	});
+	const payload = ticket.getPayload();
+	if (payload.nonce !== storedDataJson.nonce) {
+		throw new apiError(404, 'Invalid token nonce missing');
+	}
 
+	const userInfo = await userExists(payload.email, 'Google', payload.sub);
+	// check if the user is new then only issue new userID
+	let userID = userInfo.user.id;
+	if (!userInfo.user) {
+		// creating user
+		userID = crypto.randomUUID();
+		await pool.query(
+			'insert into users (id, email, name, avatar_url) values ($1,$2,$3,$4);',
+			[userID, payload.email, payload.name, payload.picture],
+		);
+
+		// adding user's google account to auth_accounts psql
+		userInfo.auth = await linkAuthAccount(userID, 'Google', payload.sub);
+	} else if (!userInfo.auth) {
+		// adding existing user's google account to auth_accounts psql
+		userInfo.auth = await linkAuthAccount(userID, 'Google', payload.sub);
+	}
+
+	// creating session
+	const sessionId = createSession(userID, req.headers['user-agent']);
+
+	// generating access_token
+	const accessToken = setAccessToken(userID, sessionId);
+
+	// generating ref_token(hash) and storing it in psql
+	const refreshToken = await setRefreshToken(userID);
 });
 
 app.listen(3000, () => {
