@@ -88,7 +88,37 @@ app.get('/api/auth/google', async (req, res) => {
 	res.redirect(url);
 });
 
-app.get('/api/auth/google/callback', async (req, res, next) => {});
+app.get('/api/auth/google/callback', async (req, res, next) => {
+	const code = req.query.code;
+		const state = req.query.state;
+		if (!code) {
+			throw new apiError(400, 'Access denied by user');
+		}
+		if (!state) {
+			throw new apiError(403, 'Unauthorized access missing state');
+		}
+
+		const storedData = await redisClient.getDel(`state:${state}`);
+		if (!storedData) {
+			throw new apiError(403, 'Invalid or missing state');
+		}
+
+		const storedDataJson = JSON.parse(storedData);
+		const { tokens } = await googleClient.getToken({
+			code,
+			codeVerifier: storedDataJson.code_verifier,
+		});
+
+		const ticket = await googleClient.verifyIdToken({
+			idToken: tokens.id_token,
+			audience: process.env.GOOGLE_CLIENT_ID,
+		});
+		const payload = ticket.getPayload();
+		if (payload.nonce !== storedDataJson.nonce) {
+			throw new apiError(404, 'Invalid token nonce missing');
+		}
+
+});
 
 app.listen(3000, () => {
 	console.log('listening');
