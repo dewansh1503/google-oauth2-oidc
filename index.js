@@ -54,6 +54,9 @@ const googleClient = new OAuth2Client(
 	process.env.REDIRECT_URI,
 );
 
+app.get('/api/auth/google', async (req, res) => {});
+
+
 app.listen(3000, () => {
 	console.log('listening');
 });
