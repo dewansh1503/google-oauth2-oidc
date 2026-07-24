@@ -173,6 +173,8 @@ app.get('/api/auth/google/callback', async (req, res, next) => {
 	}
 });
 
+app.use(errorhandler);
+
 app.listen(3000, () => {
 	console.log('listening');
 });
