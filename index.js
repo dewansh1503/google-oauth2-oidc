@@ -89,6 +89,16 @@ app.get('/api/auth/google', async (req, res) => {
 	res.redirect(url);
 });
 
+function getDeviceInfo(userAgent) {
+	const parser = new UAParser(userAgent);
+	const deviceInfo = {
+		BrowserName: parser.getBrowser(),
+		OSName: parser.getOS(),
+		DeviceType: parser.getDevice(),
+	};
+	return deviceInfo;
+}
+
 app.get('/api/auth/google/callback', async (req, res, next) => {
 	try {
 		const code = req.query.code;
