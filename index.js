@@ -184,9 +184,22 @@ app.get('/api/auth/google/callback', async (req, res, next) => {
 	}
 });
 
-app.get('/api/me',(req,res)=>{
-	
-})
+app.get('/api/me', (req, res) => {
+	const { accessToken } = req.cookies;
+	try {
+		if (!accessToken) {
+			return res.send({ message: 'no token' });
+		}
+
+		const resp = jwt.verify(
+			req.cookies.accessToken,
+			process.env.ACCESS_TOKEN_SECRET,
+		);
+		res.json({ expired: false, user_id: resp.sub });
+	} catch (error) {
+		res.json({ expired: error.message });
+	}
+});
 
 app.use(errorhandler);
 
