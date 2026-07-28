@@ -184,6 +184,10 @@ app.get('/api/auth/google/callback', async (req, res, next) => {
 	}
 });
 
+app.get('/api/me',(req,res)=>{
+	
+})
+
 app.use(errorhandler);
 
 app.listen(3000, () => {
