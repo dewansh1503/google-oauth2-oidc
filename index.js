@@ -55,6 +55,30 @@ const googleClient = new OAuth2Client(
 	process.env.REDIRECT_URI,
 );
 
+function getDeviceInfo(userAgent) {
+	const parser = new UAParser(userAgent);
+	const deviceInfo = {
+		BrowserName: parser.getBrowser(),
+		OSName: parser.getOS(),
+		DeviceType: parser.getDevice(),
+	};
+	return deviceInfo;
+}
+
+async function findAndVerifyTokens(req, res, next) {
+	const access_token = req.cookies?.accessToken;
+	if (access_token && (await verifyAccessToken(access_token))) {
+		// verify access token if valid the return else go ahead
+		return next(new apiError(403, 'User is already loggedin'));
+	}
+
+	const refresh_token = req.cookies?.refreshToken;
+	if (refresh_token && (await verifyRefreshToken(refresh_token))) {
+		return next(new apiError(403, 'User is already loggedin'));
+	}
+	next();
+}
+
 app.get('/api/auth/google', async (req, res) => {
 	const code_verifier = random();
 	const codeChallenge = crypto
@@ -88,16 +112,6 @@ app.get('/api/auth/google', async (req, res) => {
 	);
 	res.redirect(url);
 });
-
-function getDeviceInfo(userAgent) {
-	const parser = new UAParser(userAgent);
-	const deviceInfo = {
-		BrowserName: parser.getBrowser(),
-		OSName: parser.getOS(),
-		DeviceType: parser.getDevice(),
-	};
-	return deviceInfo;
-}
 
 app.get('/api/auth/google/callback', async (req, res, next) => {
 	try {
