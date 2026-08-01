@@ -14,3 +14,5 @@ function errorhandler(err, req, res, next) {
 		success: err.success,
 	});
 }
+
+export { apiError, errorhandler };
