@@ -5,3 +5,12 @@ class apiError extends Error {
 		this.success = success;
 	}
 }
+
+function errorhandler(err, req, res, next) {
+	console.log(err.message.toUpperCase());
+	console.log('STACK :>> ', err.stack);
+	res.status(err.statusCode || 500).json({
+		message: err.message.toUpperCase(),
+		success: err.success,
+	});
+}
