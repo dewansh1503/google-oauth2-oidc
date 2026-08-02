@@ -34,6 +34,19 @@ function getDeviceInfo(userAgent) {
 	return deviceInfo;
 }
 
+const authLimiter = rateLimit({
+	windowMs: 60 * 1000, // sixty seconds
+	limit: 20,
+	keyGenerator: (req) => {
+		return ipKeyGenerator(req.ip);
+	},
+	handler: (req, res) => {
+		res.status(429).json({
+			message: 'Too many login attempts. Try again later.',
+		});
+	},
+});
+
 async function findAndVerifyTokens(req, res, next) {
 	const access_token = req.cookies?.accessToken;
 	if (access_token && (await verifyAccessToken(access_token))) {
