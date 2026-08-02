@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import { createClient } from 'redis';
+import { redisClient } from './database/redisConnect.js';
 
 const app = express();
 dotenv.config();
