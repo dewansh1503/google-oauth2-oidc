@@ -126,7 +126,11 @@ app.get('/api/auth/google/callback', async (req, res, next) => {
 			throw new apiError(404, 'Invalid token nonce missing');
 		}
 
-		const userInfo = await userExists(payload.email, 'Google', payload.sub);
+		const userInfo = await userExistsInPSQL(
+			payload.email,
+			'Google',
+			payload.sub,
+		);
 		// check if the user is new then only issue new userID
 		let userID = userInfo.user.id;
 		if (!userInfo.user) {
@@ -153,7 +157,10 @@ app.get('/api/auth/google/callback', async (req, res, next) => {
 		}
 
 		// creating session
-		const sessionId = createSession(userID, req.headers['user-agent']);
+		const sessionId = await createSession(
+			userID,
+			req.headers['user-agent'],
+		);
 
 		// generating access_token
 		const accessToken = setAccessToken(userID, sessionId);
@@ -175,8 +182,8 @@ app.get('/api/auth/google/callback', async (req, res, next) => {
 			expires: addDays(new Date(), process.env.REFRESH_TOKEN_EXPIRY),
 		});
 		res.redirect('http://localhost:4000');
-	} catch (err) {
-		next(err);
+	} catch (error) {
+		next(error);
 	}
 });
 
