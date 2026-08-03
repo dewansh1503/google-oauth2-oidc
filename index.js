@@ -74,7 +74,7 @@ app.get('/api/auth/google', async (req, res) => {
 	const url = googleClient.generateAuthUrl({
 		access_type: 'offline', // for getting refresh token
 		scope: ['openid', 'email', 'profile'],
-		prompt: 'consent', // always show consent screen to user
+		// prompt: 'consent', // always show consent screen to user
 		state,
 		nonce,
 		code_challenge: codeChallenge,
@@ -92,6 +92,7 @@ app.get('/api/auth/google', async (req, res) => {
 			},
 		},
 	);
+
 	res.redirect(url);
 });
 
