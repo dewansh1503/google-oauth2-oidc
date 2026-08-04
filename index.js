@@ -18,6 +18,14 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+async function linkAuthAccount(user_id, provider, provider_id) {
+	const auth = await pool.query(
+		'insert into auth_accounts ( id, user_id, provider, provider_id) values ($1,$2,$3,$4);',
+		[crypto.randomUUID(), user_id, provider, provider_id],
+	);
+	return auth.rows[0];
+}
+
 const googleClient = new OAuth2Client(
 	process.env.GOOGLE_CLIENT_ID,
 	process.env.GOOGLE_CLIENT_SECRET,
