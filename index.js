@@ -18,6 +18,25 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+async function userExistsInPSQL(email, provider, provider_id) {
+	const user = await pool.query('select * from users where email=$1', [
+		email,
+	]);
+	let userInfo = { user: false, auth: false };
+	if (user.rows[0]) {
+		userInfo.user = user.rows[0];
+		// check if login method exists
+		const auth = await pool.query(
+			'select * from auth_accounts where user_id=$1 and provider=$2 and provider_id=$3',
+			[user.rows[0].id, provider, provider_id],
+		);
+		if (auth.rows[0]) {
+			userInfo.auth = auth.rows[0];
+		}
+	}
+	return userInfo;
+}
+
 async function linkAuthAccount(user_id, provider, provider_id) {
 	const auth = await pool.query(
 		'insert into auth_accounts ( id, user_id, provider, provider_id) values ($1,$2,$3,$4);',
