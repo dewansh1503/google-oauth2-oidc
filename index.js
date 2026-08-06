@@ -18,6 +18,23 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+function setAccessToken(user_id, session_id) {
+	const access_token = jwt.sign(
+		{
+			sub: user_id,
+			sid: session_id,
+		},
+		process.env.ACCESS_TOKEN_SECRET,
+		{
+			expiresIn: `${process.env.ACCESS_TOKEN_EXPIRY}d`,
+			algorithm: 'HS256',
+			audience: 'http://localhost:3000',
+			issuer: 'http://localhost:3000',
+		},
+	);
+	return access_token;
+}
+
 async function userExistsInPSQL(email, provider, provider_id) {
 	const user = await pool.query('select * from users where email=$1', [
 		email,
