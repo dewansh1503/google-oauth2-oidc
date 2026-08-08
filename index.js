@@ -18,6 +18,37 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+async function setRefreshToken(user_id, session_id) {
+	const token = crypto.randomBytes(32).toString('base64url');
+	const refreshToken = jwt.sign(
+		{
+			sub: user_id,
+			token,
+		},
+		process.env.REFRESH_TOKEN_SECRET,
+		{
+			expiresIn: `${process.env.REFRESH_TOKEN_EXPIRY}d`,
+			algorithm: 'HS256',
+			audience: 'http://localhost:3000',
+			issuer: 'http://localhost:3000',
+		},
+	);
+	const refreshTokenHash = crypto
+		.createHash('sha256', process.env.TOKEN_PEPPER)
+		.update(token)
+		.digest('base64url');
+
+	const expiry = addDays(
+		new Date(),
+		parseInt(process.env.REFRESH_TOKEN_EXPIRY),
+	);
+	const result = await pool.query(
+		'insert into refresh_tokens (id, user_id, token_hash, expires_at) values ($1,$2,$3,$4);',
+		[crypto.randomUUID(), user_id, refreshTokenHash, expiry.toISOString()],
+	);
+	return refreshToken;
+}
+
 function setAccessToken(user_id, session_id) {
 	const access_token = jwt.sign(
 		{
