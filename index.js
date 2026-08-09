@@ -18,6 +18,38 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+async function verifyRefreshToken(refresh_token) {
+	try {
+		const { token, sub: user_id } = jwt.verify(
+			refresh_token,
+			process.env.REFRESH_TOKEN_SECRET,
+		);
+
+		const tokenHash = crypto
+			.createHash('sha256', process.env.TOKEN_PEPPER)
+			.update(token)
+			.digest('base64url');
+
+		const result = await pool.query(
+			'select * from refresh_tokens where user_id=$1 and token_hash=$2;',
+			[user_id, tokenHash],
+		);
+		if (!result.rowCount) {
+			return false;
+		}
+		const expiry = result.rows[0].expires_at;
+		const revoked = result.rows[0].revoked;
+
+		if (revoked || isAfter(new Date(), new Date(expiry))) {
+			return false;
+		}
+		// token is valid
+		return true;
+	} catch (err) {
+		return false;
+	}
+}
+
 async function setRefreshToken(user_id, session_id) {
 	const token = crypto.randomBytes(32).toString('base64url');
 	const refreshToken = jwt.sign(
