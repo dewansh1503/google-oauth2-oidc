@@ -18,6 +18,32 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+async function verifyAccessToken(access_token) {
+	try {
+		const { sid: sessionId, sub: userId } = jwt.verify(
+			access_token,
+			process.env.ACCESS_TOKEN_SECRET,
+		);
+		const session = await redisClient.hGetAll(`session:${sessionId}`);
+		if (!session.session_id || !session.user_id) {
+			return false;
+		}
+
+		const key = `user:${session.user_id}:sessions`;
+		const value = `${session.session_id}`;
+		// session belongs to the user
+		const exists = await redisClient.sIsMember(key, value);
+		if (!exists) {
+			return false;
+		}
+
+		// valid access token
+		return true;
+	} catch (err) {
+		return false;
+	}
+}
+
 async function verifyRefreshToken(refresh_token) {
 	try {
 		const { token, sub: user_id } = jwt.verify(
