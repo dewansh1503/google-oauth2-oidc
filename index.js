@@ -18,6 +18,19 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+async function rotateRefreshToken(refresh_token) {
+	const isTokenValid = await verifyRefreshToken(refresh_token);
+	const { sid: session_id } = jwt.decode(refresh_token);
+	await revokeSession(session_id);
+	if (!isTokenValid) {
+		throw new apiError(400, 'Token invalid or expired');
+	}
+	const { sub: user_id, token } = jwt.decode(refresh_token);
+	await revokeRefreshToken(user_id, token);
+	const new_refresh_token = await setRefreshToken(user_id);
+	return new_refresh_token;
+}
+
 async function verifyAccessToken(access_token) {
 	try {
 		const { sid: sessionId, sub: userId } = jwt.verify(
