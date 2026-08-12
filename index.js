@@ -18,6 +18,11 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+async function revokeSession(session_id) {
+	const res = await redisClient.hGetDel(`session:${session_id}`);
+	console.log('deleted session', res);
+}
+
 async function rotateRefreshToken(refresh_token) {
 	const isTokenValid = await verifyRefreshToken(refresh_token);
 	const { sid: session_id } = jwt.decode(refresh_token);
