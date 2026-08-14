@@ -5,6 +5,7 @@ import { apiError, errorhandler } from './utils.js';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import { redisClient } from './database/redisConnect.js';
 import { pool } from './database/psqlConnect.js';
 import { ipKeyGenerator, rateLimit } from 'express-rate-limit';
