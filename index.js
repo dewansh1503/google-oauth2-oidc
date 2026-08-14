@@ -18,6 +18,20 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+async function revokeRefreshToken(user_id, token) {
+	const tokenHash = crypto
+		.createHash('sha256', process.env.TOKEN_PEPPER)
+		.update(token)
+		.digest('base64url');
+	const result = await pool.query(
+		`update refresh_tokens set revoked = true where user_id=$1 and token_hash=$2`,
+		[user_id, tokenHash],
+	);
+	if (!result.rowCount) {
+		throw new apiError(404, 'Invalid refresh token');
+	}
+}
+
 async function revokeSession(session_id) {
 	const res = await redisClient.hGetDel(`session:${session_id}`);
 	console.log('deleted session', res);
