@@ -19,6 +19,34 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+async function createSession(user_id, userAgent) {
+	const sessionId = crypto.randomUUID();
+	const redisUser = await redisClient.sAdd(
+		/* SADD will:
+			create the set if it does not exist
+			add the new session if it exists */
+		`user:${user_id}:sessions`,
+		sessionId,
+	);
+
+	const redisSession = await redisClient
+		/* multi is a transaction that ends with exec() */
+		.multi()
+		.hSet(`session:${sessionId}`, {
+			session_id: sessionId,
+			user_id,
+			createdAt: new Date().toISOString(),
+			userAgent: JSON.stringify(getDeviceInfo(userAgent)),
+		})
+		.expire(
+			`session:${sessionId}`,
+			24 * 60 * 60, // (sec) 1-day
+		)
+		.exec();
+
+	return sessionId;
+}
+
 async function revokeRefreshToken(user_id, token) {
 	const tokenHash = crypto
 		.createHash('sha256', process.env.TOKEN_PEPPER)
