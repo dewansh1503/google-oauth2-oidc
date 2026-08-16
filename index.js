@@ -19,6 +19,16 @@ function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
 }
 
+function getDeviceInfo(userAgent) {
+	const parser = new UAParser(userAgent);
+	const deviceInfo = {
+		BrowserName: parser.getBrowser(),
+		OSName: parser.getOS(),
+		DeviceType: parser.getDevice(),
+	};
+	return deviceInfo;
+}
+
 async function createSession(user_id, userAgent) {
 	const sessionId = crypto.randomUUID();
 	const redisUser = await redisClient.sAdd(
