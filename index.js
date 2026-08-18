@@ -4,6 +4,7 @@ import { apiError, errorhandler } from './utils.js';
 import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import { BrowserName, DeviceType, OSName } from 'ua-parser-js/enums';
 import { redisClient } from './database/redisConnect.js';
 import { pool } from './database/psqlConnect.js';
 import { ipKeyGenerator, rateLimit } from 'express-rate-limit';
