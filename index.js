@@ -13,9 +13,8 @@ import { pool } from './database/psqlConnect.js';
 import { ipKeyGenerator, rateLimit } from 'express-rate-limit';
 
 const app = express();
-dotenv.config();
-app.use(cors({ origin: 'http://localhost:4000', credentials: true }));
 app.use(cookieParser());
+app.use(cors({ origin: 'http://localhost:4000', credentials: true }));
 
 function random(encoding = 'base64url', size = 32) {
 	return crypto.randomBytes(size).toString(encoding);
@@ -230,16 +229,6 @@ const googleClient = new OAuth2Client(
 	process.env.REDIRECT_URI,
 );
 
-function getDeviceInfo(userAgent) {
-	const parser = new UAParser(userAgent);
-	const deviceInfo = {
-		BrowserName: parser.getBrowser(),
-		OSName: parser.getOS(),
-		DeviceType: parser.getDevice(),
-	};
-	return deviceInfo;
-}
-
 const authLimiter = rateLimit({
 	windowMs: 60 * 1000, // sixty seconds
 	limit: 20,
@@ -267,7 +256,9 @@ async function findAndVerifyTokens(req, res, next) {
 	next();
 }
 
-app.get('/api/auth/google', async (req, res) => {
+app.use('/api/auth', authLimiter);
+
+app.get('/api/auth/google', findAndVerifyTokens, async (req, res) => {
 	const code_verifier = random();
 	const codeChallenge = crypto
 		.createHash('sha256')
@@ -416,3 +407,5 @@ app.use(errorhandler);
 app.listen(3000, () => {
 	console.log('listening');
 });
+
+export { redisClient };
