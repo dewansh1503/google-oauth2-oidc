@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "node --env-file=.env index.js",
 		"watch": "nodemon --env-file=.env index.js",
+		"worker": "node --env-file=.env worker/sessionCleanupWorker.js"
 	},
 	"repository": {
 		"type": "git",
