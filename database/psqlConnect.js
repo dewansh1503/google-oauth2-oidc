@@ -1,6 +1,5 @@
 import { Pool } from 'pg';
 import { apiError } from '../utils.js';
-import { configDotenv } from 'dotenv';
 
 const pool = new Pool({
 	host: 'localhost',
