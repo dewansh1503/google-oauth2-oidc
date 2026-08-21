@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "node --env-file=.env index.js",
+		"watch": "nodemon --env-file=.env index.js",
 	},
 	"repository": {
 		"type": "git",
